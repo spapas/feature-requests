@@ -12,7 +12,7 @@ def home_view():
 
 @app.route("/about/")
 def about_view():
-    return render_template("about.html", )
+    return render_template("about.html")
 
 
 @app.route("/feature_requests/view/")
@@ -46,6 +46,21 @@ def feature_requests_update(feature_request_id):
         product_area=fr.product_area,
     )
     if request.method == "POST" and form.validate():
+        if db.session.query(
+            FeatureRequest.query.filter(
+                FeatureRequest.client_priority == form.data["client_priority"],
+                FeatureRequest.id != fr.id,
+                FeatureRequest.client_id == form.data['client'].id,
+            ).exists()
+        ).scalar():
+            FeatureRequest.query.filter(
+                FeatureRequest.client_priority >= form.data["client_priority"],
+                FeatureRequest.id != fr.id,
+                FeatureRequest.client_id == form.data['client'].id,
+            ).update(
+                {"client_priority": FeatureRequest.client_priority+1}
+            )
+
         fr.title = form.data["title"]
         fr.description = form.data["description"]
         fr.client = form.data["client"]
