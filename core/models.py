@@ -46,12 +46,15 @@ class FeatureRequest(MysqlMixin, Base):
     product_area_id = Column(Integer, ForeignKey("productarea.id"))
     product_area = relationship("ProductArea", back_populates="feature_requests")
 
-    def __init__(self, user_id, timestamp, lat, lon, readings):
-        self.user_id = user_id
-        self.timestamp = timestamp
-        self.lat = lat
-        self.lon = lon
-        self.readings = readings
+    def __init__(
+        self, title, description, client, client_priority, target_date, product_area
+    ):
+        self.title = title
+        self.description = description
+        self.client = client
+        self.client_priority = client_priority
+        self.target_date = target_date
+        self.product_area = product_area
 
     def __repr__(self):
         return "<FeatureRequest {0}>".format(self.title)
