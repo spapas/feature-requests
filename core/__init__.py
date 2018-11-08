@@ -1,15 +1,14 @@
 import os
 from flask import Flask
-from .database import db_session
-
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.secret_key = 'this is a super secret key !!! cool :) 1212222331'
+app.config.from_object('core.default_settings')
+app.config.from_envvar('LOCAL_SETTINGS')
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db_session.remove()
 
 
 import core.views
