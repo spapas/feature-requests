@@ -22,7 +22,7 @@ class NamedMixin(MysqlMixin):
         self.name = name
 
     def __repr__(self):
-        return "<{0} {1}>".format(self.__class__.name, self.name)
+        return self.name
 
 
 class ProductArea(NamedMixin, db.Model):

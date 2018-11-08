@@ -38,7 +38,7 @@ class FeatureRequestForm(Form):
     )
     target_date = DateField(
         u"Target date",
-        description="Select the target date for this feature request using the format 'YYYY-MM-DD'", # NOQA
+        description="Select the target date for this feature request using the format 'YYYY-MM-DD'",  # NOQA
     )
     product_area = QuerySelectField(
         u"Product area",
