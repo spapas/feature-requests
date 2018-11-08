@@ -21,8 +21,8 @@ def feature_requests_create():
     form = FeatureRequestForm(request.form)
     if request.method == "POST" and form.validate():
         fr = FeatureRequest(**form.data)
-        db.add(fr)
-        db.commit()
+        db.session.add(fr)
+        db.session.commit()
         flash("Feature request created!")
         return redirect(url_for("feature_requests_view"))
     return render_template("feature_request_form.html", form=form)
@@ -35,7 +35,7 @@ def feature_requests_update(feature_request_id):
     if request.method == "POST" and form.validate():
         fr.title = form.data["title"]
         # TODO: ADD MORE
-        db.commit()
+        db.session.commit()
 
         flash("Feature request updated!")
         return redirect(url_for("feature_requests_view"))
@@ -45,7 +45,7 @@ def feature_requests_update(feature_request_id):
 @app.route("/feature_requests/delete/<feature_request_id>", methods=["GET"])
 def feature_requests_delete(feature_request_id):
     fr = get_or_404(FeatureRequest, feature_request_id)
-    db.delete(fr)
-    db.commit()
+    db.session.delete(fr)
+    db.session.commit()
     flash("Feature request deleted!")
     return redirect(url_for("feature_requests_view"))

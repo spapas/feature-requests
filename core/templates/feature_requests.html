@@ -3,13 +3,13 @@
 {% block content %}
 
 <h1>Feature requests <a href='{{ url_for('feature_requests_create',) }}'>+</a></h1>
-{% if commands|length > 0 %}
+{% if feature_requests|length > 0 %}
     <table>
         <thead>
             <tr><th>Title</th><th>Date</th><th>Actions</th></tr>
         </thead>
         <tbody>
-            {% for c in commands %}
+            {% for c in feature_requests %}
                 <tr>
                     <td>{{ c.title }}</td>
                     <td>{{ c.target_date }}</td>
