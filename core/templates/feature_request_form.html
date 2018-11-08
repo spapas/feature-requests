@@ -12,6 +12,9 @@
       {{ render_field(form.title) }}
       {{ render_field(form.description) }}
       {{ render_select_field(form.client) }}
+      {{ render_field(form.client_priority) }}
+      {{ render_field(form.target_date) }}
+      {{ render_select_field(form.product_area) }}
     <input type='submit' value='Ok' class='btn btn-primary' >
     <a href='{{ url_for("feature_requests_view") }}' class='btn btn-default'>Return</a>
   </form>
