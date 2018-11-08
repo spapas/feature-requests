@@ -1,0 +1,2 @@
+SQLALCHEMY_DATABASE_URI='mysql+pymysql://user:pass@host/db'
+SECRET_KEY=''
