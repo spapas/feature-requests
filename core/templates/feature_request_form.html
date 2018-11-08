@@ -20,3 +20,15 @@
   </form>
 </div>
 {% endblock %}
+
+{% block extra_script %}
+  <script src="{{ url_for('static', filename='cleave.min.js') }}"></script>
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var cleave = new Cleave('#target_date', {
+      date: true,delimiter: '-',
+      datePattern: ['Y', 'm', 'd']
+    });
+  });
+  </script>
+{% endblock %}
