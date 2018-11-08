@@ -5,20 +5,26 @@
 <h1>Feature requests <a href='{{ url_for('feature_requests_create',) }}'>+</a></h1>
   <form class='form-horizontal' method='GET'>
     <div class="form-group">
-      <div class="col-2 col-sm-6">
+      <div class="col-1 col-sm-6">
         <input class="form-input" type="text" name="title" id="title" placeholder="Title" value='{{ request.args.title }}'>
       </div>
-      <div class="col-2 col-sm-6">
+      <div class="col-1 col-sm-6">
         <input class="form-input" type="text" name="description" id="description" placeholder="Description" value='{{ request.args.description }}'>
       </div>
-      <div class="col-2 col-sm-6">
+      <div class="col-1 col-sm-6">
         <input class="form-input" type="text" name="client" id="client" placeholder="Client name" value='{{ request.args.client }}'>
       </div>
-      <div class="col-2 col-sm-6">
+      <div class="col-1 col-sm-6">
         <input class="form-input" type="text" name="client_priority" id="client_priority" placeholder="Client priority" value='{{ request.args.client_priority }}'>
       </div>
-      <div class="col-2 col-sm-6">
+      <div class="col-1 col-sm-6">
         <input class="form-input" type="text" name="product_area" id="product_area" placeholder="Product area name" value='{{ request.args.product_area }}'>
+      </div>
+      <div class="col-1 col-sm-6">
+        <label class="form-checkbox">
+          <input type="checkbox" name="overdue" id="overdue" {% if request.args.overdue %}checked{% endif %}>
+          <i class="form-icon"></i> Overdue
+        </label>
       </div>
       <input type='submit' class='btn btn-primary' value='Filter'>
       <a href="{{ url_for('feature_requests_view') }}" class='btn btn-default'>Clear</a>

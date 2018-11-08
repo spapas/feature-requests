@@ -3,6 +3,7 @@ from flask import render_template, request, flash, redirect, url_for
 from .forms import FeatureRequestForm, Client, ProductArea
 from .util import get_or_404
 from .models import FeatureRequest
+import datetime
 
 
 @app.route("/")
@@ -22,6 +23,7 @@ def feature_requests_view():
     client_priority = request.args.get("client_priority")
     description = request.args.get("description")
     product_area = request.args.get("product_area")
+    overdue = request.args.get("overdue")
     feature_requests = FeatureRequest.query
     if title:
         feature_requests = feature_requests.filter(FeatureRequest.title.contains(title))
@@ -39,6 +41,10 @@ def feature_requests_view():
         feature_requests = feature_requests.filter(
             FeatureRequest.product_area_id == ProductArea.id
         ).filter(ProductArea.name.contains(product_area))
+    if overdue:
+        feature_requests = feature_requests.filter(
+            FeatureRequest.target_date <= datetime.date.today()
+        )
 
     feature_requests = feature_requests.all()
     return render_template("feature_requests.html", feature_requests=feature_requests)
