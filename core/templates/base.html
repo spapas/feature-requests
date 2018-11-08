@@ -16,9 +16,9 @@
   <header class="navbar mx-2 my-2">
     <div class="navbar-primary my-2 mx-2">
       <a href="{{ url_for('home_view') }}" class="navbar-brand mx-2">Feature Requests</a>
-      <a href="#" class="btn btn-link selected">Home</a>
+      <a href="{{ url_for('feature_requests_view') }}" class="btn btn-link">List</a>
+      <a href="{{ url_for('feature_requests_create') }}" class="btn btn-link">Create</a>
       <a href="#" class="btn btn-link">About</a>
-      <a href="#" class="btn btn-link">Contact</a>
     </div>
   </header>
 
