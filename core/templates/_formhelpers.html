@@ -1,7 +1,7 @@
 {% macro render_field(field) %}
   <div class="form-group{% if field.errors %} has-error{% endif %}">
     <label class="form-label" for={{ field.name }}>{{ field.label }}</label>
-    {{ field(class='form-input', **kwargs)|safe }}
+    {{ field(class='form-input', placeholder=field.description, **kwargs)|safe }}
     {% if field.errors %}
       {% for error in field.errors %}
         <p>{{ error }}</p>
