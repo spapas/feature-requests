@@ -1,4 +1,4 @@
-{% from "_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_field, render_select_field %}
 {% extends "base.html" %}
 {% block page_title %}Edit Command{% endblock %}
 {% block content %}
@@ -11,6 +11,7 @@
   <form method='POST' >
       {{ render_field(form.title) }}
       {{ render_field(form.description) }}
+      {{ render_select_field(form.client) }}
     <input type='submit' value='Ok' class='btn btn-primary' >
     <a href='{{ url_for("feature_requests_view") }}' class='btn btn-default'>Return</a>
   </form>
