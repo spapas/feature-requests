@@ -6,6 +6,7 @@
 <p>Connection: {{ connection }}</p>
 <ul>
     <li>List feature requests: <a href='{{ url_for("feature_requests_view") }}'>{{ url_for("feature_requests_view") }}</a></li>
+    <li>Add a feature request: <a href='{{ url_for("feature_requests_create") }}'>{{ url_for("feature_requests_create") }}</a></li>
 
 </ul>
 {% endblock %}
