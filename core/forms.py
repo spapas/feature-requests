@@ -3,7 +3,6 @@ from wtforms import (
     StringField,
     TextAreaField,
     validators,
-    SelectField,
     IntegerField,
     DateField,
 )

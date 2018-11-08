@@ -3,7 +3,7 @@ from flask import render_template, request, flash, redirect, url_for
 from .forms import FeatureRequestForm, Client, ProductArea
 from .util import get_or_404
 from .models import FeatureRequest
-from sqlalchemy import desc
+# from sqlalchemy import desc
 import datetime
 
 
@@ -47,7 +47,9 @@ def feature_requests_view():
             FeatureRequest.target_date <= datetime.date.today()
         )
 
-    feature_requests = feature_requests.order_by(FeatureRequest.target_date, FeatureRequest.client_priority).all()
+    feature_requests = feature_requests.order_by(
+        FeatureRequest.target_date, FeatureRequest.client_priority
+    ).all()
     return render_template("feature_requests.html", feature_requests=feature_requests)
 
 

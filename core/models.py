@@ -34,7 +34,7 @@ class Client(NamedMixin, db.Model):
 
 
 class FeatureRequest(MysqlMixin, db.Model):
-    title = Column(String(128), )
+    title = Column(String(128))
     description = Column(Text)
 
     client_id = Column(Integer, ForeignKey("client.id"))
