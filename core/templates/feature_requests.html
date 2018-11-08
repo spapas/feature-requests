@@ -3,36 +3,54 @@
 {% block content %}
 
 <h1>Feature requests <a href='{{ url_for('feature_requests_create',) }}'>+</a></h1>
+  <form class='form-horizontal' method='GET'>
+    <div class="form-group">
+      <div class="col-2 col-sm-6">
+        <input class="form-input" type="text" name="title" id="title" placeholder="Title" value={{ request.args.title }}>
+      </div>
+      <div class="col-2 col-sm-6">
+        <input class="form-input" type="text" name="client" id="client" placeholder="Client name">
+      </div>
+      <div class="col-2 col-sm-6">
+        <input class="form-input" type="text" name="client_priority" id="client_priority" placeholder="Client priority" value={{ request.args.client_priority }}>
+      </div>
+      <input type='submit' class='btn btn-primary' value='Filter'>
+      <a href="{{ url_for('feature_requests_view') }}" class='btn btn-default'>Clear</a>
+
+    </div>
+
+  </form>
 {% if feature_requests|length > 0 %}
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-              <th>Title</th>
-              <th>Client</th>
-              <th>Client priority</th>
-              <th>Target date</th>
-              <th>Product area</th>
-              <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for c in feature_requests %}
-                <tr>
-                    <td>{{ c.title }}</td>
-                    <td>{{ c.client }}</td>
-                    <td>{{ c.client_priority }}</td>
-                    <td>{{ c.target_date }}</td>
-                    <td>{{ c.product_area }}</td>
-                    <td>
-                      <a href='{{ url_for('feature_requests_update', feature_request_id=c.id) }}'>Update</a> |
-                      <a href='{{ url_for('feature_requests_delete', feature_request_id=c.id) }}'>Delete</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <table class="table table-striped table-hover">
+      <thead>
+          <tr>
+            <th>Title</th>
+            <th>Client</th>
+            <th>Client priority</th>
+            <th>Target date</th>
+            <th>Product area</th>
+            <th>Actions</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for c in feature_requests %}
+              <tr>
+                  <td>{{ c.title }}</td>
+                  <td>{{ c.client }}</td>
+                  <td>{{ c.client_priority }}</td>
+                  <td>{{ c.target_date }}</td>
+                  <td>{{ c.product_area }}</td>
+                  <td>
+                    <a href='{{ url_for('feature_requests_update', feature_request_id=c.id) }}'>Update</a> |
+                    <a href='{{ url_for('feature_requests_delete', feature_request_id=c.id) }}'>Delete</a>
+                  </td>
+              </tr>
+          {% endfor %}
+      </tbody>
+  </table>
 {% else %}
     No commands found.
 {% endif %}
-<a href='{{ url_for("home_view") }}'>Return</a>
+<br />
+<a class='btn btn-default' href='{{ url_for("home_view") }}'>Return</a>
 {% endblock %}

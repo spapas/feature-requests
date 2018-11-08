@@ -17,7 +17,18 @@ def about_view():
 
 @app.route("/feature_requests/view/")
 def feature_requests_view():
-    feature_requests = FeatureRequest.query.all()
+    title = request.args.get('title')
+    client = request.args.get('client')
+    client_priority = request.args.get('client_priority')
+    description = request.args.get('description')
+    product_area = request.args.get('product_area')
+    feature_requests = FeatureRequest.query
+    if title:
+        feature_requests = feature_requests.filter(FeatureRequest.title.contains(title))
+    if client_priority:
+        feature_requests = feature_requests.filter_by(client_priority=client_priority)
+
+    feature_requests = feature_requests.all()
     return render_template("feature_requests.html", feature_requests=feature_requests)
 
 
