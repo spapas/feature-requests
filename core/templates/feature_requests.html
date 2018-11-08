@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block page_title %}Commands{% endblock %}
+{% block content %}
+
+<h1>Commands <a href='{{ url_for('commands_create',) }}'>+</a></h1>
+{% if commands|length > 0 %}
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Command</th><th>Update</th></tr>
+        </thead>
+        <tbody>
+            {% for c in commands %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.command }}</td>
+                    <td><a href='{{ url_for('commands_update', command_id=c.id) }}'>Update</a></td>
+                    <td><a href='{{ url_for('commands_delete', command_id=c.id) }}'>Delete</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    No commands found.
+{% endif %}
+<a href='{{ url_for("home_view") }}'>Return</a>
+{% endblock %}
