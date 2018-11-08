@@ -25,11 +25,9 @@
   <div class="container grid-xl">
       {% with messages = get_flashed_messages() %}
         {% if messages %}
-          <ul class='flashes'>
           {% for message in messages %}
-            <li>{{ message }}</li>
+            <div class="toast toast-primary">{{ message }}</div>
           {% endfor %}
-          </ul>
         {% endif %}
       {% endwith %}
       {% block content %}{% endblock %}
