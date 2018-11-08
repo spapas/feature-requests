@@ -10,5 +10,4 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-
 import core.views

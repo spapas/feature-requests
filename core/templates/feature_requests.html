@@ -1,20 +1,20 @@
 {% extends "base.html" %}
-{% block page_title %}Commands{% endblock %}
+{% block page_title %}Feature requests{% endblock %}
 {% block content %}
 
-<h1>Commands <a href='{{ url_for('commands_create',) }}'>+</a></h1>
+<h1>Feature requests <a href='{{ url_for('feature_requests_create',) }}'>+</a></h1>
 {% if commands|length > 0 %}
     <table>
         <thead>
-            <tr><th>Name</th><th>Command</th><th>Update</th></tr>
+            <tr><th>Title</th><th>Date</th><th>Actions</th></tr>
         </thead>
         <tbody>
             {% for c in commands %}
                 <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.command }}</td>
-                    <td><a href='{{ url_for('commands_update', command_id=c.id) }}'>Update</a></td>
-                    <td><a href='{{ url_for('commands_delete', command_id=c.id) }}'>Delete</a></td>
+                    <td>{{ c.title }}</td>
+                    <td>{{ c.target_date }}</td>
+                    <td><a href='{{ url_for('feature_requests_create', feature_request_id=c.id) }}'>Update</a></td>
+                    <td><a href='{{ url_for('feature_requests_create', feature_request_id=c.id) }}'>Delete</a></td>
                 </tr>
             {% endfor %}
         </tbody>

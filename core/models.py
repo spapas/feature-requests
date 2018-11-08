@@ -1,4 +1,4 @@
-from .database import Base
+from . import db
 from sqlalchemy import Column, Integer, String, Date, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
@@ -25,15 +25,15 @@ class NamedMixin(MysqlMixin):
         return "<{0} {1}>".format(self.__class__.name, self.name)
 
 
-class ProductArea(NamedMixin, Base):
+class ProductArea(NamedMixin, db.Model):
     feature_requests = relationship("FeatureRequest", back_populates="product_area")
 
 
-class Client(NamedMixin, Base):
+class Client(NamedMixin, db.Model):
     feature_requests = relationship("FeatureRequest", back_populates="client")
 
 
-class FeatureRequest(MysqlMixin, Base):
+class FeatureRequest(MysqlMixin, db.Model):
     title = Column(String(128), unique=True)
     description = Column(Text)
 
