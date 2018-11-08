@@ -1,6 +1,6 @@
 from . import app, db as db
 from flask import render_template, request, flash, redirect, url_for
-from .forms import FeatureRequestForm
+from .forms import FeatureRequestForm, Client, ProductArea
 from .util import get_or_404
 from .models import FeatureRequest
 
@@ -17,16 +17,28 @@ def about_view():
 
 @app.route("/feature_requests/view/")
 def feature_requests_view():
-    title = request.args.get('title')
-    client = request.args.get('client')
-    client_priority = request.args.get('client_priority')
-    description = request.args.get('description')
-    product_area = request.args.get('product_area')
+    title = request.args.get("title")
+    client = request.args.get("client")
+    client_priority = request.args.get("client_priority")
+    description = request.args.get("description")
+    product_area = request.args.get("product_area")
     feature_requests = FeatureRequest.query
     if title:
         feature_requests = feature_requests.filter(FeatureRequest.title.contains(title))
+    if description:
+        feature_requests = feature_requests.filter(
+            FeatureRequest.description.contains(description)
+        )
     if client_priority:
         feature_requests = feature_requests.filter_by(client_priority=client_priority)
+    if client:
+        feature_requests = feature_requests.filter(
+            FeatureRequest.client_id == Client.id
+        ).filter(Client.name.contains(client))
+    if product_area:
+        feature_requests = feature_requests.filter(
+            FeatureRequest.product_area_id == ProductArea.id
+        ).filter(ProductArea.name.contains(product_area))
 
     feature_requests = feature_requests.all()
     return render_template("feature_requests.html", feature_requests=feature_requests)
@@ -61,16 +73,14 @@ def feature_requests_update(feature_request_id):
             FeatureRequest.query.filter(
                 FeatureRequest.client_priority == form.data["client_priority"],
                 FeatureRequest.id != fr.id,
-                FeatureRequest.client_id == form.data['client'].id,
+                FeatureRequest.client_id == form.data["client"].id,
             ).exists()
         ).scalar():
             FeatureRequest.query.filter(
                 FeatureRequest.client_priority >= form.data["client_priority"],
                 FeatureRequest.id != fr.id,
-                FeatureRequest.client_id == form.data['client'].id,
-            ).update(
-                {"client_priority": FeatureRequest.client_priority+1}
-            )
+                FeatureRequest.client_id == form.data["client"].id,
+            ).update({"client_priority": FeatureRequest.client_priority + 1})
 
         fr.title = form.data["title"]
         fr.description = form.data["description"]
