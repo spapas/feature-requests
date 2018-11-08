@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block page_title %}Odb service{% endblock %}
+{% block content %}
+
+<h1>Feature requests</h1>
+<p>Connection: {{ connection }}</p>
+<ul>
+    <li>List feature requests: <a href='{{ url_for("feature_requests_view") }}'>{{ url_for("feature_requests_view") }}</a></li>
+
+</ul>
+{% endblock %}

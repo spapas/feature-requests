@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="author" content="https://github.com/spapas/">
+  <title>{% block page_title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='spectre.min.css') }}">
+
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+
+
+</head>
+<body>
+	<header class="navbar mx-2 my-2">
+		<div class="navbar-primary my-2 mx-2">	
+			<a href="{{ url_for('home_view') }}" class="navbar-brand mx-2">Feature Requests</a>
+			<a href="#" class="btn btn-link selected">Home</a>
+			<a href="#" class="btn btn-link">About</a> 
+			<a href="#" class="btn btn-link">Contact</a> 
+		</div>
+	</header>
+	
+	<div class="container text-center">
+		<div class="page-wrapper">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class='flashes'>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+        </div>
+	</div>
+
+</body>
+
+</html>
