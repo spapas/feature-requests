@@ -10,6 +10,11 @@ def home_view():
     return render_template("home.html", connection=db.engine)
 
 
+@app.route("/about/")
+def about_view():
+    return render_template("about.html", )
+
+
 @app.route("/feature_requests/view/")
 def feature_requests_view():
     feature_requests = FeatureRequest.query.all()
