@@ -3,8 +3,8 @@
 {% block page_title %}Edit feature request{% endblock %}
 {% block content %}
 <div class="column col-6 col-xs-12">
-  {% if fr %}
-      <h1>Edit Feature Request: {{ cmd.id }}</h1>
+  {% if feature_request %}
+      <h1>Edit Feature Request: {{ feature_request.id }}</h1>
   {% else %}
       <h1>Add Feature Request</h1>
   {% endif %}

@@ -31,10 +31,22 @@ def feature_requests_create():
 @app.route("/feature_requests/update/<feature_request_id>", methods=["GET", "POST"])
 def feature_requests_update(feature_request_id):
     fr = get_or_404(FeatureRequest, feature_request_id)
-    form = FeatureRequestForm(request.form, **fr.__dict__)
+    form = FeatureRequestForm(
+        request.form,
+        title=fr.title,
+        description=fr.description,
+        client=fr.client,
+        client_priority=fr.client_priority,
+        target_date=fr.target_date,
+        product_area=fr.product_area,
+    )
     if request.method == "POST" and form.validate():
         fr.title = form.data["title"]
-        # TODO: ADD MORE
+        fr.description = form.data["description"]
+        fr.client = form.data["client"]
+        fr.client_priority = form.data["client_priority"]
+        fr.target_date = form.data["target_date"]
+        fr.product_area = form.data["product_area"]
         db.session.commit()
 
         flash("Feature request updated!")
