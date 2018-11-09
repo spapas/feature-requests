@@ -1,29 +1,29 @@
-import os
-import tempfile
-
-import pytest
-
-from core import core
+from flask_testing import TestCase
+from core import app, db
+import unittest
+import flask_testing
 
 
-@pytest.fixture
-def client():
-    db_fd, core.app.config['DATABASE'] = tempfile.mkstemp()
-    core.app.config['TESTING'] = True
-    client = core.app.test_client()
+class MyTest(TestCase):
 
-    with core.app.app_context():
-        core.db.create_all()
+    SQLALCHEMY_DATABASE_URI = "sqlite://"
+    TESTING = True
 
-    yield client
+    def create_app(self):
+        return app
 
-    os.close(db_fd)
-    os.unlink(core.app.config['DATABASE'])
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_homepage(self):
+        response = self.client.get("/")
+        assert b'Add a feature request:' in response.data
+        assert b'List feature requests:' in response.data
 
 
-def test_homepage(client):
-    """Start with a blank database."""
-
-    rv = client.get('/')
-    assert b'List feature requests' in rv.data
-    assert b'Add a feature request' in rv.data
+if __name__ == '__main__':
+    unittest.main()
