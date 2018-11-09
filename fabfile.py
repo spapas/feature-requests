@@ -17,7 +17,6 @@ def work(c):
     venv_dir = "/home/ubuntu/feature_requests/venv/bin/"
     flask_app = "FLASK_APP=core"
     c.run("{0}pip install -r {1}requirements.txt".format(venv_dir, code_dir))
-    c.run("cd {0} && {1} {2}flask db migrate".format(code_dir, flask_app, venv_dir))
     c.run("cd {0} && {1} {2}flask db upgrade".format(code_dir, flask_app, venv_dir))
     print("work ok")
 
