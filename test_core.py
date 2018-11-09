@@ -74,6 +74,7 @@ class ListpageTest(BaseTest):
 
 class AddOtherObjectsMixin:
     "A reusable mixin that adds a client and a product area to the db"
+
     def add_other_objects(self):
         self.cl = Client("C1")
         db.session.add(self.cl)
@@ -316,6 +317,59 @@ class UpdatepageTest(AddOtherObjectsMixin, BaseTest):
         assert response.status == "200 OK"
         assert FeatureRequest.query.filter_by(id=fr.id).first().client_priority == 2
         assert FeatureRequest.query.filter_by(id=fr2.id).first().client_priority == 1
+
+
+class DeletepageTest(BaseTest):
+    def add_feature_request(self):
+        "A reusable method for this class"
+        self.fr = FeatureRequest(
+            title="Title",
+            description="Desc",
+            client=None,
+            client_priority=1,
+            target_date=datetime.date(2018, 1, 1),
+            product_area=None,
+        )
+        db.session.add(self.fr)
+        db.session.commit()
+
+    def test_deletepdatepage_only_post(self):
+        "Make sure that the delete page returns 405 when requested with get"
+        response = self.client.get(
+            url_for("feature_requests_delete", feature_request_id=1232)
+        )
+        assert response.status == "405 METHOD NOT ALLOWED"
+
+    def test_deletepdatepage_not_found(self):
+        "Make sure that the delete page returs 404 when the obj is not found"
+        response = self.client.post(
+            url_for("feature_requests_delete", feature_request_id=1232)
+        )
+        assert response.status == "404 NOT FOUND"
+
+    def test_deletepage_ok(self):
+        "Make sure that the delete page deletes the obj"
+        self.add_feature_request()
+        assert db.session.query(FeatureRequest.query.filter().exists()).scalar() is True
+        response = self.client.post(
+            url_for("feature_requests_delete", feature_request_id=self.fr.id)
+        )
+        assert (
+            db.session.query(FeatureRequest.query.filter().exists()).scalar() is False
+        )
+        assert response.status == "302 FOUND"
+
+    def test_deletepage_flash_message(self):
+        "Make sure that the delete page shows the proper flash message"
+        self.add_feature_request()
+        response = self.client.post(
+            url_for("feature_requests_delete", feature_request_id=self.fr.id),
+            follow_redirects=True,
+        )
+        assert response.status == "200 OK"
+        assert b"Feature request deleted!" in response.data
+        assert response.data.count(b"Update") == 0
+        assert response.data.count(b"Delete") == 0
 
 
 if __name__ == "__main__":
