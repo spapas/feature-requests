@@ -25,16 +25,21 @@ class BaseTest(TestCase):
 
 class HomepageTest(BaseTest):
     def test_homepage(self):
+        "Make sure that homepage works fine"
         response = self.client.get(url_for("home_view"))
         assert b"Add a feature request:" in response.data
         assert b"List feature requests:" in response.data
 
 
 class ListpageTest(BaseTest):
-    def test_listpage(self):
+    def test_empty_listpage(self):
+        "Make sure that empty list page works fine"
+        response = self.client.get(url_for("home_view"))
         response = self.client.get(url_for("feature_requests_view"))
         assert b"No feature requests found." in response.data
-        response = self.client.get(url_for("feature_requests_view"))
+
+    def test_non_empty_listpage(self):
+        "Also that it can display multiple entries"
         fr = FeatureRequest(
             title="Title",
             description="Desc",
@@ -68,6 +73,7 @@ class ListpageTest(BaseTest):
 
 
 class AddOtherObjectsMixin:
+    "A reusable mixin that adds a client and a product area to the db"
     def add_other_objects(self):
         self.cl = Client("C1")
         db.session.add(self.cl)
@@ -78,12 +84,14 @@ class AddOtherObjectsMixin:
 
 class CreatepageTest(AddOtherObjectsMixin, BaseTest):
     def test_createpage(self):
+        "Make sure that the create page works"
         response = self.client.get(url_for("feature_requests_create"))
         assert b"Add Feature Request" in response.data
         assert b"<form method='POST'>" in response.data
         assert b"form-group has-error" not in response.data
 
     def test_createpage_error(self):
+        "The create page should return with error when post data is missing"
         response = self.client.post(
             url_for("feature_requests_create"),
             data=dict(
@@ -101,6 +109,7 @@ class CreatepageTest(AddOtherObjectsMixin, BaseTest):
         assert response.status == "200 OK"
 
     def test_createpage_success(self):
+        "The create page should return a 302 FOUND redirect when an entry is submitted"
         client = Client("C1")
         db.session.add(client)
         product_area = ProductArea("PA1")
@@ -120,6 +129,8 @@ class CreatepageTest(AddOtherObjectsMixin, BaseTest):
         assert response.status == "302 FOUND"
 
     def test_createpage_success_flash(self):
+        """The create page should display the proper flash message when an object is
+        created"""
         self.add_other_objects()
         response = self.client.post(
             url_for("feature_requests_create"),
@@ -141,6 +152,8 @@ class CreatepageTest(AddOtherObjectsMixin, BaseTest):
         assert self.pa.name.encode() in response.data
 
     def test_createpage_change_priorities(self):
+        """The create page should change the priorities of the other objects when a
+        new one has the same priority and client"""
         self.add_other_objects()
         fr = FeatureRequest(
             title="Title",
@@ -171,6 +184,7 @@ class CreatepageTest(AddOtherObjectsMixin, BaseTest):
 
 class UpdatepageTest(AddOtherObjectsMixin, BaseTest):
     def add_feature_request(self):
+        "A reusable method for this class"
         self.fr = FeatureRequest(
             title="Title",
             description="Desc",
@@ -183,12 +197,14 @@ class UpdatepageTest(AddOtherObjectsMixin, BaseTest):
         db.session.commit()
 
     def test_updatepage_not_found(self):
+        "Make sure that the update page returs 404 when the obj is not found"
         response = self.client.get(
             url_for("feature_requests_update", feature_request_id=1232)
         )
         assert response.status == "404 NOT FOUND"
 
     def test_updatepage_ok(self):
+        "Make sure that the update page is displayed properly along with the object"
         self.add_feature_request()
         response = self.client.get(
             url_for("feature_requests_update", feature_request_id=self.fr.id)
@@ -196,8 +212,11 @@ class UpdatepageTest(AddOtherObjectsMixin, BaseTest):
         assert "Edit Feature Request: {0}".format(self.fr.id).encode() in response.data
         assert b"<form method='POST'>" in response.data
         assert b"form-group has-error" not in response.data
+        assert self.fr.title.encode() in response.data
+        assert self.fr.description.encode() in response.data
 
     def test_updatepage_error(self):
+        "The createpage should return an error when data is missing"
         self.add_feature_request()
         response = self.client.post(
             url_for("feature_requests_update", feature_request_id=self.fr.id),
@@ -216,12 +235,14 @@ class UpdatepageTest(AddOtherObjectsMixin, BaseTest):
         assert response.status == "200 OK"
 
     def test_createpage_success(self):
+        "The createpage should properly update the object"
         self.add_feature_request()
         self.add_other_objects()
+        newtitle = "The new title"
         response = self.client.post(
             url_for("feature_requests_update", feature_request_id=self.fr.id),
             data=dict(
-                title="Title",
+                title=newtitle,
                 description="Desc",
                 client=self.cl.id,
                 client_priority=1,
@@ -230,30 +251,11 @@ class UpdatepageTest(AddOtherObjectsMixin, BaseTest):
             ),
         )
         assert response.status == "302 FOUND"
+        assert FeatureRequest.query.filter_by(id=self.fr.id).first().title == newtitle
 
     def test_updatepage_success_flash(self):
-        self.add_feature_request()
-        self.add_other_objects()
-        response = self.client.post(
-            url_for("feature_requests_update", feature_request_id=self.fr.id),
-            data=dict(
-                title="Title",
-                description="Desc",
-                client=self.cl.id,
-                client_priority=1,
-                target_date=datetime.date(2018, 1, 1),
-                product_area=self.pa.id,
-            ),
-            follow_redirects=True,
-        )
-        assert response.status == "200 OK"
-        assert b"Feature request updated!" in response.data
-        assert response.data.count(b"Update") == 1
-        assert response.data.count(b"Delete") == 1
-        assert self.cl.name.encode() in response.data
-        assert self.pa.name.encode() in response.data
-
-    def test_updatepage_fix_client_priorityies(self):
+        """Make sure that the flash message is displayed correctly and we are
+        redirected to the list view"""
         self.add_feature_request()
         self.add_other_objects()
         response = self.client.post(
@@ -276,6 +278,7 @@ class UpdatepageTest(AddOtherObjectsMixin, BaseTest):
         assert self.pa.name.encode() in response.data
 
     def test_updatepage_change_priorities(self):
+        "The updatepage should also update the client priorities"
         self.add_other_objects()
         fr = FeatureRequest(
             title="Title",
