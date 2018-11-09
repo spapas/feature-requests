@@ -10,6 +10,8 @@ class MyTest(TestCase):
     TESTING = True
 
     def create_app(self):
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
         return app
 
     def setUp(self):
@@ -21,6 +23,7 @@ class MyTest(TestCase):
 
     def test_homepage(self):
         response = self.client.get("/")
+        print (response.data)
         assert b'Add a feature request:' in response.data
         assert b'List feature requests:' in response.data
 
