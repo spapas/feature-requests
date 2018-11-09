@@ -86,6 +86,22 @@ I've added the following Feature Request views:
 Project structure
 -----------------
 
+This is a rather simple project. It has just one package (`core`) that
+contains everything:
+
+* The `__init__.py` file contains the Flask app and database initialization.
+* The `forms.py` has the definition of the FeatureRequest form
+* The `models.py` contains the ORM definition of the database tables
+* The `util.py` contains a simple utility function
+* The `views.py` contains the definition of the various views that are used
+
+There's also a template directory with the jinja2 templates and a static
+directory with a buch of css and js files. In the main directory I have
+a `fabfile.py` to be used by Fabric to auto-deploy the app, an `init_data.py`
+that can be run to fill the `Client` and `ProductArea` models with some
+initial values and the `test_core.py` which tests all views of `core` 
+(and actually gathers the tests of the application).
+
 
 
 Further enhancements
@@ -162,6 +178,11 @@ I'll also write a small description on how these can be implemented.
   commas in their names. In any case, for the actual autocomplete widget I
   have great experience with select2 (https://select2.org/) thus that's what
   I'd use.
+* Client and ProductArea CRUDs: This is definitely needed since Flask doesn't
+  have a Django Admin! Implementing all the views and templates for these
+  two models is really simple but needs hard work; I won't even go to the
+  detail of how to implement this (just do the same that I did with 
+  FeatureRequest but with a simple form).
 
 
 Flask vs Django
@@ -170,6 +191,22 @@ Flask vs Django
 One thing that I feel obligated to notice here is that if I'd used Django
 instead of Flask most of the above would be trivial and really quick to be
 implemented (just change some settings or use a django-package and change some
-settings). This is the main advantage of Django compared to Flask: You don't
-need to re-invent the wheel and write 
+settings). For example, Users are built-in in Django, table operations 
+(pagination, ordering, pretty tables etc) are
+offered through django-tables2, django-filters is great for filtering,
+django-autocomplete-light has excellent select2 support, django has Detail
+and DeleteView. Check out also my essential django packages list for more
+ideas: https://spapas.github.io/2017/10/11/essential-django-packages/
 
+How to develop
+--------------
+
+Testing
+-------
+
+How to deploy
+-------------
+
+
+Fully scripted deploy with Fabric
+---------------------------------
