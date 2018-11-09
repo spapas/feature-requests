@@ -58,3 +58,7 @@ class FeatureRequest(MysqlMixin, db.Model):
 
     def __repr__(self):
         return "<FeatureRequest {0}>".format(self.title)
+
+    def get_description(self):
+        from .util import escapejs
+        return escapejs(self.description)

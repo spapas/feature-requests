@@ -46,8 +46,8 @@
       </thead>
       <tbody>
           {% for c in feature_requests %}
-              <tr>
-                  <td>{{ c.title }}</td>
+              <tr >
+                <td><a onclick='trclick("{{ c.get_description() }}")' href='#'>{{ c.title }}</a></td>
                   <td>{{ c.client }}</td>
                   <td>{{ c.client_priority }}</td>
                   <td>{{ c.target_date }}</td>
@@ -67,4 +67,26 @@
 {% endif %}
 <br />
 <a class='btn btn-default' href='{{ url_for("home_view") }}'>Return</a>
+
+<div class="modal" id="modal-id">
+  <a onclick='document.getElementById("modal-id").classList.remove("active")' href="#close" class="modal-overlay" aria-label="Close"></a>
+  <div class="modal-container">
+    <div class="modal-header">
+      <a onclick='document.getElementById("modal-id").classList.remove("active") 'href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+    </div>
+    <div class="modal-body">
+      <div id='modal-content' class="content">
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_script %}
+  <script>
+    function trclick(data) {
+      document.getElementById("modal-content").innerHTML = data;
+      document.getElementById("modal-id").classList.add("active");
+    }
+  </script>
 {% endblock %}
