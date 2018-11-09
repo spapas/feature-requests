@@ -145,7 +145,7 @@ I'll also write a small description on how these can be implemented.
   descending by the same field. This is also easy (but needs work) to implement:
   Just add an `?ordering=field_name` parameter to the request. If the `field_name`
   starts with a `-` sort descending by that field else sort ascending. Notice
-  that needs a lot of work in the template also since each th of the table 
+  that needs a lot of work in the template also since each <th> of the table 
   needs to properly add the correct `?ordering=` to the request parameters;
   and also switch between the ascending and descending sorting.
 * Delete confirmation: This is needed to avoid accidentally deleting objects.
@@ -232,6 +232,36 @@ Testing
 
 How to deploy
 -------------
+
+I've deployed the app in an Ubuntu 18.04 AWS EC2 instance. I installed Mariadb
+10.1 from the repositories. I then created a folder in `/home/ubuntu` named
+`feature-requests` in which I created a python 3 virtual environment an then
+cloned the https://github.com/spapas/feature-requests github repo. I then
+configured the instance/local.py similar to dev to connect to the local
+Mariadb instance. 
+
+For serving the application I used gunicorn. To properly start and stop
+gunicorn I created a systemctl service for the application, you can find
+it at `feature-requests/etc/gunicorn.service`. This file should be copied to
+`/etc/systemd/system/gunicorn.service` and then run:
+
+```
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+```
+
+More info on this great tutorial here: 
+https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04
+
+I also used nginx (installed from the repositories) to serve the static files
+and as a reverse proxy for the application (i.e nginx is listening to port 80
+and forwards requests to the app to gunicorn, 
+gunicorn is listening to port 8000 and communicates through nginx). I just
+changed the nginx default configuration (found in `/etc/nginx/sites-available/default`) 
+with the one found in `feature-requests/etc/nginx-default` and you should be good to go!
+
+Finally don't forget to load the migrations by running `FLASK_APP=core flask db upgrade`
+and load the initial data `FLASK_APP python init_data.py` (from the app home directory).
 
 
 Fully scripted deploy with Fabric
