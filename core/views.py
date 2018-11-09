@@ -9,7 +9,7 @@ import datetime
 
 @app.route("/")
 def home_view():
-    return render_template("home.html", connection=db.engine)
+    return render_template("home.html", connection='test')
 
 
 @app.route("/about/")
