@@ -8,7 +8,7 @@
   {% else %}
       <h1>Add Feature Request</h1>
   {% endif %}
-  <form method='POST' >
+  <form method='POST'>
       {{ render_field(form.title) }}
       {{ render_field(form.description) }}
       {{ render_select_field(form.client) }}
