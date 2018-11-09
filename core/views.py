@@ -114,7 +114,7 @@ def feature_requests_update(feature_request_id):
     return render_template("feature_request_form.html", form=form, feature_request=fr)
 
 
-@app.route("/feature_requests/delete/<feature_request_id>", methods=["GET"])
+@app.route("/feature_requests/delete/<feature_request_id>", methods=["POST"])
 def feature_requests_delete(feature_request_id):
     fr = get_or_404(FeatureRequest, feature_request_id)
     db.session.delete(fr)

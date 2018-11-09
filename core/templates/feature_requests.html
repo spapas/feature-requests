@@ -53,8 +53,10 @@
                   <td>{{ c.target_date }}</td>
                   <td>{{ c.product_area }}</td>
                   <td>
-                    <a href='{{ url_for('feature_requests_update', feature_request_id=c.id) }}'>Update</a> |
-                    <a href='{{ url_for('feature_requests_delete', feature_request_id=c.id) }}'>Delete</a>
+                    <a class='btn btn-primary' href='{{ url_for('feature_requests_update', feature_request_id=c.id) }}'>Update</a>
+                    <form method="POST" action='{{ url_for('feature_requests_delete', feature_request_id=c.id) }}'>
+                      <input class='btn btn-error' type='submit' value='Delete'>
+                    </form>
                   </td>
               </tr>
           {% endfor %}
