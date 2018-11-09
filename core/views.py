@@ -57,6 +57,16 @@ def feature_requests_view():
 def feature_requests_create():
     form = FeatureRequestForm(request.form)
     if request.method == "POST" and form.validate():
+        if db.session.query(
+            FeatureRequest.query.filter(
+                FeatureRequest.client_priority == form.data["client_priority"],
+                FeatureRequest.client_id == form.data["client"].id,
+            ).exists()
+        ).scalar():
+            FeatureRequest.query.filter(
+                FeatureRequest.client_priority >= form.data["client_priority"],
+                FeatureRequest.client_id == form.data["client"].id,
+            ).update({"client_priority": FeatureRequest.client_priority + 1})
         fr = FeatureRequest(**form.data)
         db.session.add(fr)
         db.session.commit()
