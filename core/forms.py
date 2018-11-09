@@ -20,12 +20,14 @@ def product_area_choices():
 
 class FeatureRequestForm(Form):
     title = StringField(
-        "Title", description="Feature request title", validators=[validators.Required()]
+        "Title",
+        description="Feature request title",
+        validators=[validators.DataRequired()],
     )
     description = TextAreaField(
         "Description",
         description="Feature request description",
-        validators=[validators.Required()],
+        validators=[validators.DataRequired()],
     )
     client = QuerySelectField(
         u"Client",
