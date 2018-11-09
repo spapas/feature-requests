@@ -124,23 +124,24 @@ I'll also write a small description on how these can be implemented.
   FeatureRequest form as a select input containing all users.
 * Display the description of each FeatureRequest. The description is a Text
   field (i.e it can be rather long) so I didn't put it in the table. Right
-  now you can see it if you edit the table; this isn't ideal. There are a lot
-  of ways this could be resolved. The classic Djangoish one is to just add
+  now you can see it through a modal if you click on the feature request's
+  name or if you edit the table; this isn't ideal. For displaying it in the 
+  modal I use a nice trick (encode the description to JS compatible text and
+  just put it to the modal using vanilla JS). There are also other ways t o
+  do that: The classic Djangoish one is to just add
   a Detail view for that FeatureRequest where you'll get a full page with all
   the information of that FeatureRequest along with proper action buttons in
-  the end. The more modern one would be to add a show-description button
-  that would display the description in a JS created popup; you can even
+  the end. The more modern one 
   avoid loading the description and fetching it through ajax whenever it
   is requested. Of course this last solution (using ajax to fetch the 
   description) would mean that an extra Ajax view that returns the description
-  of a FeatureRequest using its id would be needed. Too much work if you
-  ask me; good-old DetailView seems ok to me
+  of a FeatureRequest using its id would be needed. '
 * Pagination: This is definitely needed. Flask-SqlAlchemy supports it out of
   the box so I'd just need to pass the correct `?page=x` query parameter and
   then limit the results by returning the objects from page * page_number to
   (page+1) * page_number.
 * Table fields ordering: This is a nice to have if you have a table: Click on
-  the th of a field and sort by this field ascending. Click again and sort
+  the <th> of a field and sort by this field ascending. Click again and sort
   descending by the same field. This is also easy (but needs work) to implement:
   Just add an `?ordering=field_name` parameter to the request. If the `field_name`
   starts with a `-` sort descending by that field else sort ascending. Notice
@@ -200,6 +201,31 @@ ideas: https://spapas.github.io/2017/10/11/essential-django-packages/
 
 How to develop
 --------------
+
+Create a virtualenv and install the requirements. Then you should add a file
+named `local.py` in the `instance` folder by copying the `local.py.template`
+and adding the proper settings. If you want to use Sqlite3 for development
+add something like
+
+```
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'data.sqlite')
+```
+
+If you want to use mysql: 
+
+```
+SQLALCHEMY_DATABASE_URI='mysql+pymysql://user:pass@host/database'
+```
+
+Then you should set the `FLASK_APP` environment to `core` (i.e `SET FLASK_APP=core`
+in Windows cmd or `export FLASK_APP=core` in bash), create the migrations by running `flask db upgrade` and
+load some initial data by running `python init_data.py`. Finally you can
+run the server by running `flask run`.
+
 
 Testing
 -------
