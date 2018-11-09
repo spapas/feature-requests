@@ -31,34 +31,10 @@ class HomepageTest(BaseTest):
 
 
 class ListpageTest(BaseTest):
-    def test_1_listpage_empty(self):
+    def test_3_add_more_feature_requests(self):
         response = self.client.get(url_for("feature_requests_view"))
         assert b"No feature requests found." in response.data
-
-    def test_2_add_feature_request(self):
-        fr = FeatureRequest(
-            title="Title",
-            description="Desc",
-            client=None,
-            client_priority=1,
-            target_date=datetime.date(2018, 1, 1),
-            product_area=None,
-        )
-        db.session.add(fr)
-        db.session.commit()
         response = self.client.get(url_for("feature_requests_view"))
-        assert b"Update" in response.data
-        assert (
-            url_for("feature_requests_update", feature_request_id=1).encode()
-            in response.data
-        )
-        assert b"Delete" in response.data
-        assert (
-            url_for("feature_requests_delete", feature_request_id=1).encode()
-            in response.data
-        )
-
-    def test_3_add_more_feature_requests(self):
         fr = FeatureRequest(
             title="Title",
             description="Desc",
@@ -81,7 +57,14 @@ class ListpageTest(BaseTest):
         response = self.client.get(url_for("feature_requests_view"))
         assert response.data.count(b'Update') == 2
         assert response.data.count(b'Delete') == 2
-
+        assert (
+            url_for("feature_requests_update", feature_request_id=1).encode()
+            in response.data
+        )
+        assert (
+            url_for("feature_requests_delete", feature_request_id=1).encode()
+            in response.data
+        )
 
 if __name__ == "__main__":
     unittest.main()
