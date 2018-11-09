@@ -1,0 +1,12 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/feature_requests/feature-requests/
+ExecStart=/home/ubuntu/feature_requests/venv/bin/gunicorn --access-logfile - --workers 3 --bind 127.0.0.1:8000 core:app                                                                                             orkers 3 --bind 127.0.0.1:8000 core:app
+
+[Install]
+WantedBy=multi-user.target
