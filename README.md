@@ -1,30 +1,45 @@
-# feature-requests
+# Feature requests application
+
 A simple application in Flask
 
-Tools used
-----------
+## Tools used and rationale
 
+I wanted to keep this project as simple as possible (so as to follow closely the KISS principle) so most
+choises will be because of that:
+
+* Python 3
 * Flask as the main web framework
 * SqlAlchemy as an ORM for database operations
-* Fabric to deploy the application
+* Mysql (actually MariaDB) as the main database
 * Flask-Migrate for db migration handling
 * WTForms for form validation
 * Jinja2 for templates
 * gunicorn for serving
 * Cleave.js for date "cleaving"
 * Spectre minimalistic css framework
+* Fabric to deploy the application
 * Various libs for properly integrating the above
 
+Python 3 is (finally) here to stay and I use it in all my new projects!
+I used Flask because I had some experience with it (I've even written a Flask-Mongodb-Heroku-API tutorial back in 2014:
+https://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/) and I know that with a little (or maybe a lot of) work
+it can have most of Django's capabilities. I chose MySQL/MariaDB mainly because it feels easy and I wanted a change from
+PostgreSQL which I usually use in production projects. For deploying the python application (wsgi) I chose gunicorn due
+to its simplicitly especially when compared with other solutions (I'm looking at you, uwsgi). I had used spectre in a
+couple of hobby projects before (ie https://github.com/spapas/hyperapp-tutorial) and seemed good enough for this application.
+Finally, Fabric is my go-to tool for automatic deployment of changes to prod/uat.
 
-Project description
--------------------
+## Project description
 
 This is a simple Flask application with a small number of normal HTTP views.
-There's no need for REST/ajax or anything fancy; the for is too simple. The only
-JS enhancement is the usage of cleave-js to help formatting the dates. I prefer
+In my opinion there's no need for REST/ajax or anything fancy; the application
+can be implemented and have an excellent UX with good-old HTTO request/response views
+and almost no javascript. The only
+JS enhancements is the usage of cleave-js to help formatting the dates. I prefer
 it much more than a traditional approach (like f.e jquery-ui datepicker) because it 
-seems much more intuitive. There's a home and about views
-that display some static info and then there are the views for the Feature Requests.
+seems much more intuitive and a quick and dirty trick that I've used to display
+the description of a feature request in a popup. Beyond these, everything else is
+pure HTML.
 
 The application uses three main models:
 
@@ -83,8 +98,8 @@ I've added the following Feature Request views:
 * A delete view: A simple view to delete feature requests. It only works with
   http POSTS and is called from the list view.
 
-Project structure
------------------
+## Project structure
+
 
 This is a rather simple project. It has just one package (`core`) that
 contains everything:
@@ -185,9 +200,7 @@ I'll also write a small description on how these can be implemented.
   detail of how to implement this (just do the same that I did with 
   FeatureRequest but with a simple form).
 
-
-Flask vs Django
----------------
+## Flask vs Django
 
 One thing that I feel obligated to notice here is that if I'd used Django
 instead of Flask most of the above would be trivial and really quick to be
@@ -199,15 +212,14 @@ django-autocomplete-light has excellent select2 support, django has Detail
 and DeleteView. Check out also my essential django packages list for more
 ideas: https://spapas.github.io/2017/10/11/essential-django-packages/
 
-How to develop
---------------
+## How to develop
 
 Create a virtualenv and install the requirements. Then you should add a file
 named `local.py` in the `instance` folder by copying the `local.py.template`
 and adding the proper settings. If you want to use Sqlite3 for development
 add something like
 
-```
+``` python
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -217,7 +229,7 @@ SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'data.sqlite')
 
 If you want to use mysql: 
 
-```
+``` python
 SQLALCHEMY_DATABASE_URI='mysql+pymysql://user:pass@host/database'
 ```
 
@@ -227,11 +239,19 @@ load some initial data by running `python init_data.py`. Finally you can
 run the server by running `flask run`.
 
 
-Testing
--------
+## Testing
 
-How to deploy
--------------
+The file `test_core.py` contains proper tests for all the views of the application. I didn't think that any
+more tests would be required for such a simple application. The part of the code that would need the most
+testing would be the functionality of changing the client priorities when there's a conflict. This could 
+have been moved to a separate module (i.e `services.py` or something) so that it'd be called from the views
+and the testing code would be to explicitly call that code. However because of the way it's been implemented
+(i.e it will need to read and update the database) and due to the size of the app (very small and simple) I
+didn't feel that putting it in a separate module would offer much thus I left it inside the view; since the
+tests that check the view properly check that the conflicting client priorities have been updated correctly
+that part should be considered properly tested.
+
+## How to deploy
 
 I've deployed the app in an Ubuntu 18.04 AWS EC2 instance. I installed Mariadb
 10.1 from the repositories. I then created a folder in `/home/ubuntu` named
@@ -263,6 +283,24 @@ with the one found in `feature-requests/etc/nginx-default` and you should be goo
 Finally don't forget to load the migrations by running `FLASK_APP=core flask db upgrade`
 and load the initial data `FLASK_APP python init_data.py` (from the app home directory).
 
+## Fully scripted deploy with Fabric
 
-Fully scripted deploy with Fabric
----------------------------------
+I am using Fabric 1.x in all my projects to quickly deploy changes to production
+(or uat) and I am really happy with it, for example check out the `fabfile.py` for this
+project: https://github.com/spapas/mailer_server
+
+For the Feature Requests app I decided to try my luck in upgrading my fabfile to use Fabric 2.x so
+that everything would be Python 3.x; in my previous Python 3.x projects I was using my good-old Fabric 1.x fabfile
+so I was using a Python 2.7 Fabric 1.x to actually run the fabfile. 
+
+Well, I regretted that decision! Fabric 2.x has way too many changes and there's too little documentation
+(and proper SO answers) for using it. Thus I had to fall back to implementing a rather simple fabfile that
+was able to get the job done nevertheless: This fabfile has four tasks: 
+
+* pull: To retrieve the latest changesets  from the remote github repo
+* work: To install any new requirements and run migration upgrades
+* restart: To restart the gunicorn application using systemctl
+* full-deploy: To run all the above
+
+To configure it just set `hosts` = `[ user@hostname ]` in that fabfile using the user and hostname where you want to deploy. To
+run it try something `fab -i /path/to/amazon-aws-key.pem full-deploy`.
