@@ -33,37 +33,42 @@ Finally, Fabric is my go-to tool for automatic deployment of changes to prod/uat
 
 This is a simple Flask application with a small number of normal HTTP views.
 In my opinion there's no need for REST/ajax or anything fancy; the application
-can be implemented and have an excellent UX with good-old HTTO request/response views
+can be implemented and have an excellent UX with good-old HTTP request/response views
 and almost no javascript. The only
 JS enhancements is the usage of cleave-js to help formatting the dates. I prefer
 it much more than a traditional approach (like f.e jquery-ui datepicker) because it 
 seems much more intuitive and a quick and dirty trick that I've used to display
-the description of a feature request in a popup. Beyond these, everything else is
-pure HTML.
+the description of a feature request in a modal popup (more on this later). 
+Beyond these, everything else is pure HTML.
 
 The application uses three main models:
 
-* FeatureRequest: This is the main model that the application is about. It
-  contains the fields id (primary key), name, description (text field), client
+* `FeatureRequest`: This is the main model that the application is about. It
+  contains the fields `id` (primary key), `name`, `description` (text field), `client`
   (foreign key to Client model),
-  client priority (integer field, will be unique for each client's feature
-  requests), target date (the desired date for this feature request) and 
-  product area (foreign key to the ProductArea model)
-* Client: This is a simple model with a name that will be used to persist the
+  `client_priority` (integer field, will be unique for each client's feature
+  requests), `target_date` (the desired date for this feature request) and 
+  `product_area` (foreign key to the `ProductArea` model)
+* `Client`: This is a simple model with a name that will be used to persist the
   clients that require the features
-* ProductArea: Another simple model similar to Client, will persist the product
+* `ProductArea`: Another simple model similar to Client, will persist the product
   areas of each feature request.
 
 I've added the following Feature Request views:
 
-* A list view: This is the main page of the application; the user can see all
+* A list view (`/feature_requests/view/`): This is the main page of the application; the user can see all
   the existing feature requests along with most of their info (actually all the
   info is there except the feature request description which is a bit too long
-  for that). The feature requests are displayed in a page (with a missing 
+  for that). The description can be seen in a modal if you click on the 
+  name of each feature requests. For displaying it in the
+  modal I use a nice but Q+D trick (encode the description to JS compatible text to
+  avoid XSS attacks and just dump it to the modal content using vanilla JS; it
+  is very simple but gets the job done).
+  The feature requests are displayed in a table (with a missing
   pagination and sort funtionality) but at least there's proper filtering by
   various fields of the feature requests. There's even an `overdue` checkbox
   to filter by the feature requests that a past target date.
-* A create view: It displays a form for inserting a new feature request object
+* A create view (`/feature_requests/create/`): It displays a form for inserting a new feature request object
   to the database. The client and product area fields are selects that take their
   values from the corresponding mode values. The target date uses cleave.js to
   properly format the date. There's proper validation for all fields (i.e the
@@ -90,16 +95,15 @@ I've added the following Feature Request views:
             ).update({"client_priority": FeatureRequest.client_priority + 1})
 ```
 
-* An update view: This is more or less similar to the create view; it just
+* An update view (`/feature_requests/update/id`): This is more or less similar to the create view; it just
   updates the object with the same validations as those described above. It
   also has the same client priority for the same client check and fix as the
   create view.
 
-* A delete view: A simple view to delete feature requests. It only works with
+* A delete view (`/feature_requests/delete/id`): A simple view to delete feature requests. It only works with
   http POSTS and is called from the list view.
 
 ## Project structure
-
 
 This is a rather simple project. It has just one package (`core`) that
 contains everything:
@@ -117,16 +121,14 @@ that can be run to fill the `Client` and `ProductArea` models with some
 initial values and the `test_core.py` which tests all views of `core` 
 (and actually gathers the tests of the application).
 
-
-
-Further enhancements
---------------------
+# Further enhancements
 
 There are a lot of things that are missing from this application. I've only
-implemented the requirements. Most of the missing things
-are rather simple to be implemented but they will need implementation time.
-I'll also write a small description on how these can be implemented.
-
+implemented the basic requirements. Most of the missing things
+are rather simple to be implemented but they will need implementation time
+which I lack right now.
+However as a bonus I'll present a list of the things I'd like to have to
+consider this application as (mostly) complete along with a small description on how these could be implemented.
 
 * Users: A user component is definitely missing. The feature requests should
   save the user that added them and also it would be nice if each feature
@@ -134,27 +136,21 @@ I'll also write a small description on how these can be implemented.
   a package like Flask-user (https://flask-user.readthedocs.io/en/latest/)
   would be used; I'd then add two ForeignKeys to the FeatureRequest model one
   with the user that created the FeatureRequest and one (nullable) with the
-  user that has been assigned this FeatureRequest. The first foreign key would
+  user that has been assigned this `FeatureRequest`. The first foreign key would
   be auto-filled when the object would be created, the 2nd could just go to
   FeatureRequest form as a select input containing all users.
 * Display the description of each FeatureRequest. The description is a Text
   field (i.e it can be rather long) so I didn't put it in the table. Right
   now you can see it through a modal if you click on the feature request's
-  name or if you edit the table; this isn't ideal. For displaying it in the 
-  modal I use a nice trick (encode the description to JS compatible text and
-  just put it to the modal using vanilla JS). There are also other ways t o
-  do that: The classic Djangoish one is to just add
+  name or if you edit the table; this isn't ideal from a UX point of view. 
+  For me the best way would be the classic Djangoish one, ie to just add
   a Detail view for that FeatureRequest where you'll get a full page with all
-  the information of that FeatureRequest along with proper action buttons in
-  the end. The more modern one 
-  avoid loading the description and fetching it through ajax whenever it
-  is requested. Of course this last solution (using ajax to fetch the 
-  description) would mean that an extra Ajax view that returns the description
-  of a FeatureRequest using its id would be needed. '
+  the information of that FeatureRequest along with proper action buttons 
+  (update, delete) in the bottom of that detail view.
 * Pagination: This is definitely needed. Flask-SqlAlchemy supports it out of
   the box so I'd just need to pass the correct `?page=x` query parameter and
-  then limit the results by returning the objects from page * page_number to
-  (page+1) * page_number.
+  then limit the results by returning the objects from `page * page_number` to
+  `(page+1) * page_number`.
 * Table fields ordering: This is a nice to have if you have a table: Click on
   the <th> of a field and sort by this field ascending. Click again and sort
   descending by the same field. This is also easy (but needs work) to implement:
@@ -175,17 +171,23 @@ I'll also write a small description on how these can be implemented.
 * Mark finished Featured Requests. An `is_finished` boolean field is needed
   to mark the feature requests that have been implemented; we don't want to
   get stressed that we have overdue feature requests when we've actually finished
-  them! 
-  Probably also add a `POST` mark as finished view to be able to mark the 
+  them! Probably also add a `POST` mark as finished view to be able to mark the 
   feature request as finished without the need to actually display the upgrade
-  form.
+  form. Actually, each `FeatureRequest` could have more state instead of a
+  boolean one (finished or not), for example something like `FUTURE`,
+  `SPECS`, `DEVELOPING`, `TESTING`, `COMPLETE` etc along with the proper
+  `POST` view to change its state.
 * Stats/aggregates: I really like stats so I'd definitely add some
   stats like how many feature requests per client / per priority / per 
-  target area / that are overdue etc.
+  target area / that are overdue etc. Also it would be nice to tell each client
+  that the previous year/month we implemented N of your `FeatureRequests` and
+  each one of them in so much time and with none of them overdue! Of course to
+  have proper stats we'd need to keep more info about each `FeatureRequest`
+  like when it was reported first, when it was completed, if it was overdue etc.
 * Autocompletes: Well if you have many clients (or many product areas or
   many users if you have implemented my first suggestion) you'll probably need
   a proper autocomplete for that field. Just add a simple view that would get
-  the `?term=` as a request parameter and query the Client model by names
+  the `?term=` as a request parameter and query the `Client` model by names
   starting with the term. It should probably return the data in a JSON array;
   yes some people would argue that since we want to keep it simple why not
   return strings separated with commas - the problem with that is that the
@@ -194,23 +196,40 @@ I'll also write a small description on how these can be implemented.
   commas in their names. In any case, for the actual autocomplete widget I
   have great experience with select2 (https://select2.org/) thus that's what
   I'd use.
-* Client and ProductArea CRUDs: This is definitely needed since Flask doesn't
+* `Client` and `ProductArea` CRUDs: This is definitely needed since Flask doesn't
   have a Django Admin! Implementing all the views and templates for these
   two models is really simple but needs hard work; I won't even go to the
   detail of how to implement this (just do the same that I did with 
-  FeatureRequest but with a simple form).
+  FeatureRequest but with a simple form). For now either add values to the
+  these models through the database or just run `init_data.py` to auto
+  add some values to these models.
+* Full Auditing: I like to know which user changed which fields of each `FeatureRequest` or 
+  at least which user added and last edited each `FeatureRequest`. Here's a post for
+  model auditing in Django to give you some ideas: https://spapas.github.io/2015/01/21/django-model-auditing/
 
 ## Flask vs Django
 
-One thing that I feel obligated to notice here is that if I'd used Django
+Please notice that I'm a rather experience Django developer (check out my 
+blog for some more Django articles if you want https://spapas.github.io/category/django.html)
+that's why I am addng this section (and also that's why some of my
+comments here refer to Django).
+
+For this reason, one thing that I feel obligated to add here is that if I'd used Django
 instead of Flask most of the above would be trivial and really quick to be
 implemented (just change some settings or use a django-package and change some
 settings). For example, Users are built-in in Django, table operations 
 (pagination, ordering, pretty tables etc) are
 offered through django-tables2, django-filters is great for filtering,
 django-autocomplete-light has excellent select2 support, django has Detail
-and DeleteView. Check out also my essential django packages list for more
+and DeleteView. Check out my essential django packages list for more
 ideas: https://spapas.github.io/2017/10/11/essential-django-packages/
+
+Flask seems like a really nice framework however you must be very careful in
+which applications you are going to use it. It probably is good for something
+simple that uses a couple of REST views but if you want to implement more
+complex things then you are going to slowly and painfully research, gather and integrate
+various things that Django (and its packages) offers you in the plate. So why not just eat from
+that  plate?
 
 ## How to develop
 
